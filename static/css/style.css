@@ -1,0 +1,42 @@
+:root {
+    --primary-brown: #8B4513;
+    --secondary-brown: #DEB887;
+    --light-brown: #F5DEB3;
+    --white: #FFFFFF;
+}
+
+body {
+    background-color: var(--white);
+    color: #333;
+}
+
+.navbar {
+    background-color: var(--light-brown) !important;
+}
+
+.navbar-brand {
+    color: var(--primary-brown) !important;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: var(--primary-brown) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-brown);
+    border-color: var(--primary-brown);
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-brown);
+    border-color: var(--secondary-brown);
+}
+
+.card {
+    border-color: var(--secondary-brown);
+}
+
+.card-header {
+    background-color: var(--light-brown);
+} 

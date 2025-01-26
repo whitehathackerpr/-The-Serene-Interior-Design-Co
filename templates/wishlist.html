@@ -1,0 +1,266 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="wishlist-container">
+    <div class="wishlist-header">
+        <h1><i class="fas fa-heart me-2"></i>My Wishlist</h1>
+    </div>
+
+    {% if wishlist_items %}
+    <div class="wishlist-grid">
+        {% for item in wishlist_items %}
+        <div class="wishlist-card">
+            <div class="wishlist-card-image">
+                {% if item.image_url %}
+                    <img src="{{ url_for('static', filename='images/' + item.image_url) }}" 
+                         alt="{{ item.name }}"
+                         onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                         alt="Product placeholder">
+                {% endif %}
+                <button class="remove-btn" onclick="removeFromWishlist({{ item.id }})">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="wishlist-card-content">
+                <h3 class="product-title">{{ item.name }}</h3>
+                <p class="product-description">{{ item.description[:100] }}{% if item.description|length > 100 %}...{% endif %}</p>
+                <div class="product-price">UGX{{ "{:,.0f}".format(item.price) }}</div>
+                <button class="add-to-cart-btn" onclick="addToCart({{ item.id }})">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-wishlist">
+        <div class="empty-wishlist-content">
+            <i class="far fa-heart"></i>
+            <h3>Your wishlist is empty</h3>
+            <p>Save items you like to your wishlist and they'll show up here</p>
+            <a href="{{ url_for('products') }}" class="start-shopping-btn">
+                Start Shopping
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.wishlist-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.wishlist-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.wishlist-header h1 {
+    font-size: 2rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.wishlist-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.wishlist-card:hover {
+    transform: translateY(-5px);
+}
+
+.wishlist-card-image {
+    position: relative;
+    height: 200px;
+}
+
+.wishlist-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.wishlist-card-content {
+    padding: 1.5rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.product-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: var(--primary-dark);
+}
+
+.empty-wishlist {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-wishlist-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-wishlist i {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 1.5rem;
+}
+
+.empty-wishlist h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.empty-wishlist p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.start-shopping-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.start-shopping-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .wishlist-container {
+        padding: 1rem;
+    }
+    
+    .wishlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+}
+</style>
+
+<script>
+function addToCart(productId) {
+    fetch(`/add_to_cart/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            window.location.href = '/login';
+        } else {
+            showToast('Product added to cart successfully!');
+            // Update cart count if it exists
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = parseInt(cartCount.textContent || 0) + 1;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error adding product to cart', 'error');
+    });
+}
+
+function removeFromWishlist(productId) {
+    if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+        fetch(`/remove_from_wishlist/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showToast(data.error, 'error');
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error removing item from wishlist', 'error');
+        });
+    }
+}
+</script>
+{% endblock %} 

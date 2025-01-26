@@ -1,0 +1,455 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="cart-container">
+    <h2 class="cart-title text-center mb-5">Shopping Cart</h2>
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="cart-items-container">
+                {% for item in cart_items %}
+                <div class="cart-item" data-product-id="{{ item.product_id }}">
+                    <div class="cart-item-image">
+                        <img src="{{ item.image_url }}" 
+                             alt="{{ item.name }}" 
+                             onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'"
+                             class="product-image">
+                    </div>
+                    <div class="cart-item-details">
+                        <h5 class="item-name">{{ item.name }}</h5>
+                        <p class="item-price">UGX{{ "{:,.0f}".format(item.price) }}</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn update-quantity" data-action="decrease" data-product-id="{{ item.product_id }}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="quantity-input" value="{{ item.quantity }}" min="1" max="99" readonly>
+                            <button class="quantity-btn update-quantity" data-action="increase" data-product-id="{{ item.product_id }}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cart-item-total">
+                        <span>UGX{{ "{:,.0f}".format(item.total) }}</span>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="remove-item" data-product-id="{{ item.product_id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="order-summary">
+                <h3 class="summary-title">Order Summary</h3>
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span data-summary="subtotal">UGX{{ "{:,.0f}".format(subtotal) }}</span>
+                    </div>
+                    {% if discount > 0 %}
+                    <div class="summary-row discount">
+                        <span>Member Discount</span>
+                        <span data-summary="discount">-UGX{{ "{:,.0f}".format(discount) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span data-summary="total">UGX{{ "{:,.0f}".format(total) }}</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('checkout') }}" class="checkout-btn">
+                    Proceed to Checkout
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="{{ url_for('products') }}" class="continue-shopping">
+                    <i class="fas fa-arrow-left"></i>
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <div class="empty-cart-content">
+            <i class="fas fa-shopping-bag"></i>
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added anything to your cart yet</p>
+            <a href="{{ url_for('products') }}" class="start-shopping-btn">
+                Start Shopping
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.cart-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.cart-title {
+    font-size: 2rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.cart-items-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: auto 2fr 1fr 1fr auto;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease;
+}
+
+.cart-item:hover {
+    background-color: #f8f9fa;
+}
+
+.cart-item-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-item-details {
+    padding-right: 1rem;
+}
+
+.item-name {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.item-price {
+    color: #666;
+    margin: 0;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity-btn {
+    border: none;
+    background: none;
+    padding: 0.5rem 1rem;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.quantity-input {
+    width: 50px;
+    border: none;
+    text-align: center;
+    font-weight: 500;
+    background: none;
+}
+
+.cart-item-total {
+    font-weight: 500;
+    color: #333;
+}
+
+.remove-item {
+    border: none;
+    background: none;
+    color: #dc3545;
+    padding: 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.remove-item:hover {
+    opacity: 1;
+}
+
+.order-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 2rem;
+}
+
+.summary-title {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.summary-details {
+    margin-bottom: 1.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.summary-row.discount {
+    color: #28a745;
+}
+
+.summary-row.total {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.continue-shopping {
+    display: block;
+    text-align: center;
+    color: #666;
+    text-decoration: none;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-cart-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.empty-cart i {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 1.5rem;
+}
+
+.empty-cart h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.empty-cart p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.start-shopping-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.start-shopping-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .cart-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .cart-item-image {
+        margin: 0 auto;
+    }
+
+    .quantity-controls {
+        justify-content: center;
+    }
+
+    .cart-item-actions {
+        display: flex;
+        justify-content: center;
+    }
+}
+</style>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update quantity
+    document.querySelectorAll('.update-quantity').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const action = this.dataset.action;
+            const row = this.closest('tr');
+            const quantityInput = this.parentElement.querySelector('input');
+            let newQuantity = parseInt(quantityInput.value);
+
+            if (action === 'increase') {
+                newQuantity++;
+            } else {
+                newQuantity = Math.max(1, newQuantity - 1);
+            }
+
+            updateCartItem(productId, newQuantity, row);
+        });
+    });
+
+    // Remove item
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            const row = this.closest('tr');
+            
+            if (confirm('Are you sure you want to remove this item?')) {
+                removeCartItem(productId, row);
+            }
+        });
+    });
+
+    // Function to update cart item
+    function updateCartItem(productId, quantity, row) {
+        fetch(`/api/cart`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            // Update quantity display
+            const quantityInput = row.querySelector('input[type="number"]');
+            quantityInput.value = quantity;
+            
+            // Update item total
+            const totalCell = row.querySelector('td:nth-last-child(2)');
+            const price = parseFloat(row.querySelector('td:nth-child(2)').textContent.replace('UGX', '').replace(/,/g, ''));
+            const itemTotal = price * quantity;
+            totalCell.textContent = `UGX${itemTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            // Update order summary
+            updateOrderSummary(data.subtotal, data.discount, data.total);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating cart');
+        });
+    }
+
+    // Function to remove cart item
+    function removeCartItem(productId, row) {
+        fetch(`/api/cart`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            
+            // Remove the row
+            row.remove();
+            
+            // Update order summary
+            updateOrderSummary(data.subtotal, data.discount, data.total);
+            
+            // If cart is empty, reload page to show empty cart message
+            if (document.querySelector('tbody').children.length === 0) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error removing item');
+        });
+    }
+
+    // Function to update order summary
+    function updateOrderSummary(subtotal, discount, total) {
+        document.querySelector('[data-summary="subtotal"]').textContent = 
+            `UGX${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        if (discount > 0) {
+            document.querySelector('[data-summary="discount"]').textContent = 
+                `-UGX${discount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+        
+        document.querySelector('[data-summary="total"]').textContent = 
+            `UGX${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

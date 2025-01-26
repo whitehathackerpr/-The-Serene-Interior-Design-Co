@@ -1,0 +1,643 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="row g-4">
+        <!-- User Profile Card -->
+        <div class="col-lg-3">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h4 class="profile-name">{{ user.name }}</h4>
+                    <p class="profile-email">{{ user.email }}</p>
+                </div>
+                <div class="profile-nav">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile">
+                        <i class="fas fa-user"></i>Profile
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orders">
+                        <i class="fas fa-shopping-bag"></i>Orders
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#appointments">
+                        <i class="fas fa-calendar-alt"></i>Appointments
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#wishlist">
+                        <i class="fas fa-heart"></i>Wishlist
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Tab -->
+                <div class="tab-pane fade show active" id="profile">
+                    <div class="content-card">
+                        <div class="content-section">
+                            <h3><i class="fas fa-user-edit me-2"></i>Profile Information</h3>
+                            <form method="POST" action="{{ url_for('update_profile') }}" class="custom-form">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="name" name="name" 
+                                                   value="{{ user.name }}" required>
+                                            <label for="name">Full Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{ user.email }}" required>
+                                            <label for="email">Email Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                                   value="{{ user.phone }}">
+                                            <label for="phone">Phone Number</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-save me-2"></i>Update Profile
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="content-section">
+                            <h3><i class="fas fa-lock me-2"></i>Change Password</h3>
+                            <form method="POST" action="{{ url_for('change_password') }}" class="custom-form">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control" id="current_password" 
+                                                   name="current_password" required>
+                                            <label for="current_password">Current Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control" id="new_password" 
+                                                   name="new_password" required>
+                                            <label for="new_password">New Password</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="password" class="form-control" id="confirm_password" 
+                                                   name="confirm_password" required>
+                                            <label for="confirm_password">Confirm New Password</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3">
+                                    <i class="fas fa-key me-2"></i>Change Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="tab-pane fade" id="orders">
+                    <div class="content-card">
+                        <h3><i class="fas fa-shopping-bag me-2"></i>Order History</h3>
+                        {% if orders %}
+                            <div class="orders-list">
+                                {% for order in orders %}
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div class="order-info">
+                                            <h5>Order #{{ order.id }}</h5>
+                                            <span class="badge bg-{{ order.status_color }}">{{ order.status }}</span>
+                                        </div>
+                                        <div class="order-meta">
+                                            <span><i class="far fa-calendar me-2"></i>{{ order.created_at.strftime('%B %d, %Y') }}</span>
+                                            <span><i class="fas fa-money-bill-wave me-2"></i>UGX{{ "{:,.0f}".format(order.total_amount) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="order-details" id="orderDetails{{ order.id }}">
+                                        {% for item in order.items %}
+                                        <div class="order-item">
+                                            <span>{{ item.name }} × {{ item.quantity }}</span>
+                                            <span>UGX{{ "{:,.0f}".format(item.price) }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-2" 
+                                            onclick="toggleOrderDetails({{ order.id }})">
+                                        <i class="fas fa-chevron-down me-1"></i>View Details
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-shopping-bag"></i>
+                                <p>No orders found</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Appointments Tab -->
+                <div class="tab-pane fade" id="appointments">
+                    <div class="content-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3><i class="fas fa-calendar-alt me-2"></i>My Appointments</h3>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookAppointmentModal">
+                                <i class="fas fa-plus me-2"></i>Book New Appointment
+                            </button>
+                        </div>
+                        {% if appointments %}
+                            <div class="appointments-list">
+                                {% for appointment in appointments %}
+                                <div class="appointment-card">
+                                    <div class="appointment-header">
+                                        <div class="appointment-info">
+                                            <h5>Appointment on {{ appointment.appointment_date.strftime('%B %d, %Y') }}</h5>
+                                            <span class="badge bg-{{ appointment.status_color }}">{{ appointment.status }}</span>
+                                        </div>
+                                        <div class="appointment-meta">
+                                            <span><i class="far fa-clock me-2"></i>{{ appointment.appointment_date.strftime('%I:%M %p') }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="appointment-notes">{{ appointment.notes }}</p>
+                                    {% if appointment.status == 'pending' %}
+                                    <button class="btn btn-danger btn-sm" onclick="cancelAppointment({{ appointment.id }})">
+                                        <i class="fas fa-times me-2"></i>Cancel Appointment
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>No appointments scheduled</p>
+                                <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#bookAppointmentModal">
+                                    Book Your First Appointment
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Wishlist Tab -->
+                <div class="tab-pane fade" id="wishlist">
+                    <div class="content-card">
+                        <h3><i class="fas fa-heart me-2"></i>My Wishlist</h3>
+                        {% if wishlist_items %}
+                            <div class="wishlist-grid">
+                                {% for item in wishlist_items %}
+                                <div class="wishlist-item">
+                                    <div class="wishlist-image">
+                                        {% if item.image_url %}
+                                            <img src="{{ url_for('static', filename='images/' + item.image_url) }}" 
+                                                 alt="{{ item.name }}"
+                                                 onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                                                 alt="Product placeholder">
+                                        {% endif %}
+                                    </div>
+                                    <div class="wishlist-details">
+                                        <h5>{{ item.name }}</h5>
+                                        <p class="price">UGX{{ "{:,.0f}".format(item.price) }}</p>
+                                        <div class="wishlist-actions">
+                                            <button class="btn btn-primary btn-sm" onclick="addToCart({{ item.id }})">
+                                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" onclick="removeFromWishlist({{ item.id }})">
+                                                <i class="fas fa-trash me-2"></i>Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-heart"></i>
+                                <p>Your wishlist is empty</p>
+                                <a href="{{ url_for('products') }}" class="btn btn-primary mt-3">
+                                    Browse Products
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    padding: 2rem;
+    background: #f8f9fa;
+    min-height: calc(100vh - 60px);
+}
+
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+    padding: 2rem;
+    text-align: center;
+    color: white;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.profile-email {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.profile-nav {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profile-nav .nav-link {
+    width: 100%;
+    text-align: left;
+    padding: 1rem 1.5rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.profile-nav .nav-link:hover,
+.profile-nav .nav-link.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.profile-nav .nav-link i {
+    width: 20px;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.content-section {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.content-section:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.custom-form .form-floating {
+    margin-bottom: 1rem;
+}
+
+.order-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.order-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #666;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .order-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Tab content styles */
+.tab-content {
+    display: block;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.show.active {
+    display: block;
+}
+
+/* Add smooth transitions */
+.tab-pane {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tab-pane.show.active {
+    opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-nav {
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-nav .nav-link {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Appointments styles */
+.appointment-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.appointment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.appointment-notes {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+/* Wishlist styles */
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.wishlist-item {
+    display: flex;
+    gap: 1rem;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.wishlist-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.wishlist-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.wishlist-details {
+    flex: 1;
+}
+
+.wishlist-details h5 {
+    margin: 0 0 0.5rem 0;
+}
+
+.wishlist-details .price {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.wishlist-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .wishlist-item {
+        flex-direction: column;
+    }
+    
+    .wishlist-image {
+        width: 100%;
+        height: 200px;
+    }
+    
+    .wishlist-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+// Initialize Bootstrap tabs
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all tab triggers
+    const tabTriggers = document.querySelectorAll('.nav-link');
+    
+    // Add click event listeners
+    tabTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all triggers
+            tabTriggers.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked trigger
+            this.classList.add('active');
+            
+            // Show the corresponding tab content
+            const tabId = this.getAttribute('data-bs-target');
+            const tabContent = document.querySelector(tabId);
+            
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            
+            // Show the selected tab pane
+            if (tabContent) {
+                tabContent.classList.add('show', 'active');
+            }
+        });
+    });
+    
+    // Handle direct linking to tabs
+    const hash = window.location.hash;
+    if (hash) {
+        const trigger = document.querySelector(`[data-bs-target="${hash}"]`);
+        if (trigger) {
+            trigger.click();
+        }
+    }
+});
+
+// Order details toggle function
+function toggleOrderDetails(orderId) {
+    const details = document.getElementById(`orderDetails${orderId}`);
+    const button = details.nextElementSibling;
+    
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        button.innerHTML = '<i class="fas fa-chevron-up me-1"></i>Hide Details';
+    } else {
+        details.style.display = 'none';
+        button.innerHTML = '<i class="fas fa-chevron-down me-1"></i>View Details';
+    }
+}
+
+function addToCart(productId) {
+    fetch(`/add_to_cart/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'error');
+        } else {
+            showToast('Product added to cart successfully!');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error adding to cart', 'error');
+    });
+}
+
+function removeFromWishlist(productId) {
+    if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+        fetch(`/remove_from_wishlist/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showToast(data.error, 'error');
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error removing from wishlist', 'error');
+        });
+    }
+}
+
+function cancelAppointment(appointmentId) {
+    if (confirm('Are you sure you want to cancel this appointment?')) {
+        fetch(`/cancel_appointment/${appointmentId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showToast(data.error, 'error');
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error canceling appointment', 'error');
+        });
+    }
+}
+</script>
+{% endblock %} 

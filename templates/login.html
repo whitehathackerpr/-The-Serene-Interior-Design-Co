@@ -1,0 +1,263 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="login-container">
+    <div class="row justify-content-center align-items-center min-vh-100 py-5">
+        <div class="col-md-6 col-lg-5">
+            <!-- Login Form Card -->
+            <div class="auth-card">
+                <div class="auth-header text-center">
+                    <div class="logo-wrapper mb-4">
+                        <i class="fas fa-home fa-2x"></i>
+                    </div>
+                    <h2 class="auth-title">Welcome Back</h2>
+                    <p class="auth-subtitle">Please login to your account</p>
+                </div>
+                
+                <div class="auth-body">
+                    <form method="POST" action="{{ url_for('login') }}" class="login-form">
+                        <!-- Email Input -->
+                        <div class="form-floating mb-4">
+                            <input type="email" 
+                                   class="form-control custom-input" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="name@example.com"
+                                   required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Email address
+                            </label>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control custom-input" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Password"
+                                   required>
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <button type="button" 
+                                    class="btn btn-link password-toggle" 
+                                    onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <!-- Forgot Password Link -->
+                        <div class="d-flex justify-content-end mb-4">
+                            <a href="{{ url_for('reset_password') }}" class="forgot-password">
+                                Forgot password?
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100 login-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider my-4">
+                        <span class="divider-text">or</span>
+                    </div>
+
+                    <!-- Social Login Buttons -->
+                    <div class="social-login">
+                        <button class="btn btn-outline-secondary w-100 mb-3">
+                            <i class="fab fa-google me-2"></i>Continue with Google
+                        </button>
+                        <button class="btn btn-outline-secondary w-100">
+                            <i class="fab fa-facebook-f me-2"></i>Continue with Facebook
+                        </button>
+                    </div>
+
+                    <!-- Register Link -->
+                    <p class="text-center mt-4 mb-0">
+                        Don't have an account? 
+                        <a href="{{ url_for('register') }}" class="register-link">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 76px);
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .logo-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        color: white;
+    }
+
+    .auth-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .custom-input {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        height: auto;
+        font-size: 1rem;
+    }
+
+    .custom-input:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(230, 126, 34, 0.25);
+    }
+
+    .form-floating > label {
+        padding-left: 1rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        padding: 0;
+    }
+
+    .forgot-password {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password:hover {
+        color: var(--primary-color);
+    }
+
+    .login-btn {
+        padding: 0.75rem;
+        font-weight: 500;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border: none;
+        transition: transform 0.3s ease;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .divider {
+        position: relative;
+        text-align: center;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 30px);
+        height: 1px;
+        background-color: #dee2e6;
+    }
+
+    .divider::before {
+        left: 0;
+    }
+
+    .divider::after {
+        right: 0;
+    }
+
+    .divider-text {
+        background-color: white;
+        padding: 0 1rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .social-login .btn {
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .social-login .btn:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+    .register-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .register-link:hover {
+        color: var(--primary-color);
+    }
+</style>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.querySelector('.password-toggle i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.classList.remove('fa-eye');
+            toggleButton.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.classList.remove('fa-eye-slash');
+            toggleButton.classList.add('fa-eye');
+        }
+    }
+
+    // Add floating label animation
+    document.querySelectorAll('.custom-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+</script>
+{% endblock %} 

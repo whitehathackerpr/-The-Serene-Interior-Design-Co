@@ -1,0 +1,479 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="row g-4">
+        <!-- Left Column - Checkout Form -->
+        <div class="col-lg-8">
+            <div class="checkout-card">
+                <div class="checkout-progress mb-4">
+                    <div class="progress-step active">
+                        <span class="step-number">1</span>
+                        <span class="step-text">Shipping</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <span class="step-number">2</span>
+                        <span class="step-text">Payment</span>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <span class="step-number">3</span>
+                        <span class="step-text">Confirmation</span>
+                    </div>
+                </div>
+
+                <form id="checkoutForm" method="POST">
+                    <!-- Shipping Information -->
+                    <div class="checkout-section" id="shippingSection">
+                        <h3 class="section-title">
+                            <i class="fas fa-shipping-fast me-2"></i>Shipping Information
+                        </h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="firstName" name="firstName" required>
+                                    <label for="firstName">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="lastName" name="lastName" required>
+                                    <label for="lastName">Last Name</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control custom-input" id="email" name="email" required>
+                                    <label for="email">Email Address</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="address" name="address" required>
+                                    <label for="address">Street Address</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="city" name="city" required>
+                                    <label for="city">City</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="state" name="state" required>
+                                    <label for="state">State</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control custom-input" id="zipCode" name="zipCode" required>
+                                    <label for="zipCode">ZIP Code</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="checkout-section mt-4">
+                        <h3 class="section-title">
+                            <i class="fas fa-credit-card me-2"></i>Payment Information
+                        </h3>
+                        <div class="card-element-container mb-3">
+                            <div id="card-element" class="form-control custom-input"></div>
+                            <div id="card-errors" class="payment-error mt-2" role="alert"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 checkout-btn">
+                        <i class="fas fa-lock me-2"></i>Place Order Securely
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="col-lg-4">
+            <div class="order-summary-card">
+                <h3 class="summary-title">
+                    <i class="fas fa-shopping-cart me-2"></i>Order Summary
+                </h3>
+                
+                <div class="order-items">
+                    {% for item in cart_items %}
+                    <div class="order-item">
+                        <div class="item-details">
+                            {% if item.image_url %}
+                                <img src="{{ url_for('static', filename='images/' + item.image_url) }}" 
+                                     alt="{{ item.name }}" 
+                                     class="item-image"
+                                     onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/placeholder.jpg') }}" 
+                                     alt="Product image placeholder" 
+                                     class="item-image">
+                            {% endif %}
+                            <div class="item-info">
+                                <h6 class="item-name">{{ item.name }}</h6>
+                                <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                            </div>
+                        </div>
+                        <span class="item-price">UGX{{ "{:,.0f}".format(item.price * item.quantity) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>Subtotal</span>
+                        <span>UGX{{ "{:,.0f}".format(subtotal) }}</span>
+                    </div>
+                    {% if discount and discount > 0 %}
+                    <div class="price-row discount">
+                        <span>Member Discount</span>
+                        <span>-UGX{{ "{:,.0f}".format(discount) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="price-row">
+                        <span>Shipping</span>
+                        <span>UGX{{ "{:,.0f}".format(shipping) }}</span>
+                    </div>
+                    <div class="price-row total">
+                        <strong>Total</strong>
+                        <strong>UGX{{ "{:,.0f}".format(total) }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.checkout-container {
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 100px);
+}
+
+.checkout-card, .order-summary-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 2rem;
+}
+
+.checkout-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.progress-step.active .step-number {
+    background: var(--primary-color);
+    color: white;
+}
+
+.progress-line {
+    flex-grow: 1;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 1rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.custom-input {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.custom-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+.card-element-container {
+    padding: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+}
+
+.checkout-btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 2rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+}
+
+.order-items {
+    margin-bottom: 1.5rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    margin: 0;
+    font-weight: 500;
+}
+
+.item-quantity {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.price-breakdown {
+    margin-top: 1.5rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.price-row.discount {
+    color: #28a745;
+}
+
+.price-row.total {
+    border-top: 2px solid #eee;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+}
+
+.payment-error {
+    color: #dc3545;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 1rem;
+    }
+    
+    .checkout-card, .order-summary-card {
+        padding: 1.5rem;
+    }
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.item-quantity {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.item-price {
+    font-weight: 500;
+    color: #333;
+    min-width: 100px;
+    text-align: right;
+}
+
+.order-summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.summary-title {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+</style>
+
+{% block scripts %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe('your_publishable_key');
+const elements = stripe.elements();
+
+// Custom styling for Stripe Elements
+const style = {
+    base: {
+        fontSize: '16px',
+        color: '#32325d',
+        fontFamily: '"Poppins", sans-serif',
+        '::placeholder': {
+            color: '#aab7c4'
+        },
+        padding: '10px 12px',
+    },
+    invalid: {
+        color: '#dc3545',
+        iconColor: '#dc3545'
+    }
+};
+
+const card = elements.create('card', {style: style});
+card.mount('#card-element');
+
+// Handle real-time validation errors
+card.addEventListener('change', function(event) {
+    const displayError = document.getElementById('card-errors');
+    if (event.error) {
+        displayError.textContent = event.error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
+
+// Handle form submission
+const form = document.getElementById('checkoutForm');
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+    try {
+        const {error} = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: card,
+                billing_details: {
+                    name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                    email: document.getElementById('email').value,
+                    address: {
+                        line1: document.getElementById('address').value,
+                        city: document.getElementById('city').value,
+                        state: document.getElementById('state').value,
+                        postal_code: document.getElementById('zipCode').value
+                    }
+                }
+            }
+        });
+
+        if (error) {
+            const errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message;
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order Securely';
+        } else {
+            window.location.href = '/order-confirmation';
+        }
+    } catch (e) {
+        console.error('Error:', e);
+        const errorElement = document.getElementById('card-errors');
+        errorElement.textContent = 'An unexpected error occurred. Please try again.';
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order Securely';
+    }
+});
+
+// Fetch client secret
+fetch('/api/create-payment-intent', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        cart_items: {{ cart_items|tojson }}
+    })
+})
+.then(response => response.json())
+.then(data => {
+    clientSecret = data.clientSecret;
+})
+.catch(error => {
+    console.error('Error:', error);
+    const errorElement = document.getElementById('card-errors');
+    errorElement.textContent = 'Failed to initialize payment. Please try again.';
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - The Serene Interior Design Co{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products.index') }}">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-image-gallery">
+                <img src="{{ product.image_url or url_for('static', filename='images/default-product.jpg') }}"
+                     class="img-fluid rounded main-image" alt="{{ product.name }}">
+                {% if product.additional_images %}
+                <div class="thumbnail-gallery mt-3">
+                    {% for image in product.additional_images %}
+                    <img src="{{ image }}" class="thumbnail" onclick="updateMainImage(this.src)"
+                         alt="{{ product.name }} view {{ loop.index }}">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="product-info">
+                <h1 class="mb-3">{{ product.name }}</h1>
+                {% if product.is_vip_only %}
+                <span class="badge bg-warning text-dark mb-3">VIP Only</span>
+                {% endif %}
+                <h2 class="price mb-4">${{ "%.2f"|format(product.price) }}</h2>
+                
+                <div class="description mb-4">
+                    <h5>Description</h5>
+                    <p>{{ product.description }}</p>
+                </div>
+
+                {% if product.stock > 0 %}
+                <div class="stock-info mb-4">
+                    <span class="badge bg-success">In Stock</span>
+                    <small class="text-muted ms-2">{{ product.stock }} units available</small>
+                </div>
+
+                {% if current_user.is_authenticated and (not product.is_vip_only or current_user.is_vip) %}
+                <form class="add-to-cart-form" onsubmit="return addToCart(event)">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" id="quantity" name="quantity"
+                               value="1" min="1" max="{{ product.stock }}">
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    </div>
+                </form>
+                {% elif product.is_vip_only and not current_user.is_vip %}
+                <div class="alert alert-warning">
+                    This product is exclusive to VIP members. 
+                    <a href="{{ url_for('main.vip_membership') }}">Upgrade to VIP</a>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="stock-info mb-4">
+                    <span class="badge bg-danger">Out of Stock</span>
+                    <button class="btn btn-outline-primary ms-3" onclick="notifyWhenAvailable()">
+                        Notify When Available
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Additional Product Information -->
+                <div class="additional-info mt-4">
+                    <h5>Product Details</h5>
+                    <ul class="list-unstyled">
+                        {% if product.dimensions %}
+                        <li><strong>Dimensions:</strong> {{ product.dimensions }}</li>
+                        {% endif %}
+                        {% if product.material %}
+                        <li><strong>Material:</strong> {{ product.material }}</li>
+                        {% endif %}
+                        {% if product.color %}
+                        <li><strong>Color:</strong> {{ product.color }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="related-products mt-5">
+        <h3 class="mb-4">Related Products</h3>
+        <div class="row">
+            {% for related in related_products %}
+            <div class="col-md-3">
+                <div class="card product-card">
+                    <img src="{{ related.image_url or url_for('static', filename='images/default-product.jpg') }}"
+                         class="card-img-top" alt="{{ related.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.name }}</h5>
+                        <p class="card-text">${{ "%.2f"|format(related.price) }}</p>
+                        <a href="{{ url_for('products.detail', id=related.id) }}" 
+                           class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addToCart(event) {
+    event.preventDefault();
+    const quantity = document.getElementById('quantity').value;
+    
+    fetch(`/shop/cart/add/{{ product.id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: parseInt(quantity) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    });
+    
+    return false;
+}
+
+function updateMainImage(src) {
+    document.querySelector('.main-image').src = src;
+}
+
+function notifyWhenAvailable() {
+    fetch(`/products/{{ product.id }}/notify`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('You will be notified when this product is back in stock.');
+        }
+    });
+}
+</script>
+{% endblock %} 

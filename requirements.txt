@@ -1,0 +1,9 @@
+Flask
+Flask-MySQLdb
+Werkzeug
+PyMySQL
+python-dotenv
+stripe
+Flask-Mail
+celery
+flask_migrate

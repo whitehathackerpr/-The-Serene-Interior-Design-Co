@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+
+{% block title %}Register - The Serene Interior Design Co{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="row justify-content-center align-items-center min-vh-100 py-5">
+        <div class="col-md-6 col-lg-5">
+            <!-- Registration Form Card -->
+            <div class="auth-card">
+                <div class="auth-header text-center">
+                    <div class="logo-wrapper mb-4">
+                        <i class="fas fa-user-plus fa-2x"></i>
+                    </div>
+                    <h2 class="auth-title">Create Account</h2>
+                    <p class="auth-subtitle">Join our community of interior design enthusiasts</p>
+                </div>
+
+                <div class="auth-body">
+                    <form method="POST" action="{{ url_for('register') }}" class="register-form" id="registerForm">
+                        <!-- Full Name Input -->
+                        <div class="form-floating mb-4">
+                            <input type="text" 
+                                   class="form-control custom-input" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="John Doe"
+                                   required>
+                            <label for="name">
+                                <i class="fas fa-user me-2"></i>Full Name
+                            </label>
+                        </div>
+
+                        <!-- Email Input -->
+                        <div class="form-floating mb-4">
+                            <input type="email" 
+                                   class="form-control custom-input" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="name@example.com"
+                                   required>
+                            <label for="email">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="form-floating mb-4">
+                            <input type="password" 
+                                   class="form-control custom-input" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Password"
+                                   required>
+                            <label for="password">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <button type="button" 
+                                    class="btn btn-link password-toggle" 
+                                    onclick="togglePassword('password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <div class="password-strength mt-2" id="passwordStrength"></div>
+                        </div>
+
+                        <!-- Confirm Password Input -->
+                        <div class="form-floating mb-4">
+                            <input type="password" 
+                                   class="form-control custom-input" 
+                                   id="confirm_password" 
+                                   name="confirm_password" 
+                                   placeholder="Confirm Password"
+                                   required>
+                            <label for="confirm_password">
+                                <i class="fas fa-lock me-2"></i>Confirm Password
+                            </label>
+                            <button type="button" 
+                                    class="btn btn-link password-toggle" 
+                                    onclick="togglePassword('confirm_password')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="terms-link">Terms & Conditions</a>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100 register-btn">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider my-4">
+                        <span class="divider-text">or</span>
+                    </div>
+
+                    <!-- Social Registration -->
+                    <div class="social-login">
+                        <button class="btn btn-outline-secondary w-100 mb-3">
+                            <i class="fab fa-google me-2"></i>Register with Google
+                        </button>
+                        <button class="btn btn-outline-secondary w-100">
+                            <i class="fab fa-facebook-f me-2"></i>Register with Facebook
+                        </button>
+                    </div>
+
+                    <!-- Login Link -->
+                    <p class="text-center mt-4 mb-0">
+                        Already have an account? 
+                        <a href="{{ url_for('login') }}" class="login-link">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .register-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 76px);
+    }
+
+    /* Reuse styles from login page and add these additional styles */
+    .password-strength {
+        height: 4px;
+        background-color: #e9ecef;
+        border-radius: 2px;
+        position: relative;
+        margin-top: 0.5rem;
+    }
+
+    .password-strength::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .password-strength[data-strength="weak"]::before {
+        width: 33%;
+        background-color: #dc3545;
+    }
+
+    .password-strength[data-strength="medium"]::before {
+        width: 66%;
+        background-color: #ffc107;
+    }
+
+    .password-strength[data-strength="strong"]::before {
+        width: 100%;
+        background-color: #28a745;
+    }
+
+    .terms-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .terms-link:hover {
+        color: var(--primary-color);
+    }
+
+    .register-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    }
+</style>
+
+<script>
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleButton = passwordInput.nextElementSibling.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleButton.classList.remove('fa-eye');
+            toggleButton.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleButton.classList.remove('fa-eye-slash');
+            toggleButton.classList.add('fa-eye');
+        }
+    }
+
+    // Password strength checker
+    document.getElementById('password').addEventListener('input', function(e) {
+        const password = e.target.value;
+        const strengthMeter = document.getElementById('passwordStrength');
+        
+        // Check password strength
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        const isLongEnough = password.length >= 8;
+
+        const strength = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar, isLongEnough]
+            .filter(Boolean).length;
+
+        // Update strength indicator
+        if (password.length === 0) {
+            strengthMeter.removeAttribute('data-strength');
+        } else if (strength <= 2) {
+            strengthMeter.setAttribute('data-strength', 'weak');
+        } else if (strength <= 4) {
+            strengthMeter.setAttribute('data-strength', 'medium');
+        } else {
+            strengthMeter.setAttribute('data-strength', 'strong');
+        }
+    });
+
+    // Password match validation
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+        }
+    });
+</script>
+{% endblock %} 

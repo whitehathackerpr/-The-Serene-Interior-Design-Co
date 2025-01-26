@@ -1,0 +1,293 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section with Parallax Effect -->
+<div class="hero-section position-relative overflow-hidden">
+    <div class="hero-background"></div>
+    <div class="hero-content text-center">
+        <h1 class="display-3 mb-4 fade-in">Welcome to The Serene Interior Design Co.</h1>
+        <p class="lead mb-4 fade-in-delay">Transform your space into a sanctuary of style and comfort</p>
+        <a href="{{ url_for('products') }}" class="btn btn-outline-light btn-lg hover-fill">Explore Our Collection</a>
+    </div>
+</div>
+
+<!-- Featured Categories -->
+<div class="container my-6">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="card-content text-center">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-couch"></i>
+                    </div>
+                    <h3 class="feature-title">Quality Furniture</h3>
+                    <p class="feature-text">Discover our handpicked collection of premium furniture pieces.</p>
+                    <a href="{{ url_for('products') }}" class="btn btn-link stretched-link">Browse Collection →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="card-content text-center">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-paint-roller"></i>
+                    </div>
+                    <h3 class="feature-title">Design Services</h3>
+                    <p class="feature-text">Book a consultation with our expert interior designers.</p>
+                    <a href="#" class="btn btn-link stretched-link">Book Consultation →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="card-content text-center">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-percent"></i>
+                    </div>
+                    <h3 class="feature-title">Member Discounts</h3>
+                    <p class="feature-text">Sign up for exclusive discounts and special offers.</p>
+                    <a href="{{ url_for('register') }}" class="btn btn-link stretched-link">Join Now →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Collections Section -->
+<div class="latest-collections py-6">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Latest Collections</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="collection-card">
+                    <img src="{{ url_for('static', filename='images/products/modern-sofa.jpg') }}" alt="Modern Living" class="img-fluid">
+                    <div class="collection-overlay">
+                        <h3>Modern Living</h3>
+                        <p>Contemporary designs for modern homes</p>
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-light">View Collection</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="collection-card">
+                    <img src="{{ url_for('static', filename='images/products/dining-set.jpg') }}" alt="Dining Elegance" class="img-fluid">
+                    <div class="collection-overlay">
+                        <h3>Dining Elegance</h3>
+                        <p>Sophisticated dining room furniture</p>
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-light">View Collection</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this to your existing style block or create a new one -->
+<style>
+    /* Hero Section */
+    .hero-section {
+        height: 100vh;
+        min-height: 600px;
+        position: relative;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                    url('{{ url_for('static', filename='images/products/persian-rug.jpg') }}') center/cover;
+        transform: scale(1.1);
+        transition: transform 0.5s ease-out;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        padding: 2rem;
+        max-width: 800px;
+    }
+
+    /* Animations */
+    .fade-in {
+        opacity: 0;
+        animation: fadeIn 1s ease-out forwards;
+    }
+
+    .fade-in-delay {
+        opacity: 0;
+        animation: fadeIn 1s ease-out 0.5s forwards;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 2.5rem;
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        background: var(--accent-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .icon-wrapper {
+        transform: scale(1.1);
+    }
+
+    .feature-title {
+        font-family: 'Playfair Display', serif;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .feature-text {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Latest Collections */
+    .latest-collections {
+        background-color: var(--light-bg);
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-color);
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background-color: var(--accent-color);
+    }
+
+    .collection-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 15px;
+        height: 400px;
+    }
+
+    .collection-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .collection-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        text-align: center;
+        padding: 2rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .collection-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .collection-card:hover .collection-overlay {
+        opacity: 1;
+    }
+
+    /* Utility Classes */
+    .my-6 {
+        margin-top: 6rem;
+        margin-bottom: 6rem;
+    }
+
+    .py-6 {
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+    }
+
+    /* Button Styles */
+    .btn-outline-light {
+        border-width: 2px;
+        font-weight: 500;
+        padding: 0.75rem 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+        background-color: #fff;
+        color: var(--primary-color);
+    }
+
+    .btn-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0;
+    }
+
+    .btn-link:hover {
+        color: var(--primary-color);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .hero-section {
+            height: 70vh;
+        }
+
+        .collection-card {
+            height: 300px;
+        }
+    }
+</style>
+
+<!-- Add this script at the end of your content block -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parallax effect for hero section
+    window.addEventListener('scroll', function() {
+        const scroll = window.pageYOffset;
+        const background = document.querySelector('.hero-background');
+        background.style.transform = `scale(1.1) translateY(${scroll * 0.5}px)`;
+    });
+});
+</script>
+{% endblock %} 
