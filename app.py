@@ -28,7 +28,7 @@ app.config['MAIL_PASSWORD'] = 'your-app-password'
 mail = Mail(app)
 
 # Configure Stripe
-stripe.api_key = 'sk_test_51QP4DXHb1M37dKMaTUOMrGippwaKQ7cj3adcrAhpbnMJV5nsCbK59SZy8kDy4kYLb1SdSK12UN3RVaMjgqPK4XmP00GTJLSTtw'
+stripe.api_key = 'sk_fake_51QP4DXHb1M37dKMaTUOMrGippwaKQ7cj3adcrAhpbnMJV5nsCbK59SZy8kDy4kYLb1SdSK12UN3RVaMjggfdffcrddrrqPK4XmP00GTJLSTtw'
 
 # Admin middleware
 def admin_required(f):
